@@ -1,0 +1,53 @@
+name:                helm-renderer
+version:             0.1.0.0
+github:              "afnanenayet/helm-renderer"
+license:             BSD3
+author:              "Afnan Enayet"
+maintainer:          "afnan@blend.com"
+copyright:           "Afnan Enayet"
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on GitHub at <https://github.com/afnanenayet/helm-renderer#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+- turtle
+- text
+- filepath
+- optparse-applicative
+- strict-base-types
+
+library:
+  source-dirs: src
+
+executables:
+  helm-renderer-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - helm-renderer
+
+tests:
+  helm-renderer-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - helm-renderer
