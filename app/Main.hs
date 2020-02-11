@@ -44,7 +44,7 @@ optParser =
                 )
         <*> optional
                 (strOption
-                    (long "values" <> metavar "VALUES" <> help
+                    (long "values" <> short 'f' <> metavar "VALUES" <> help
                         "The path to the optional values YAML"
                     )
                 )
@@ -153,7 +153,7 @@ main = do
         else do
             putStrLn "Retrieved Helm output successfully"
             let preprocessed = preprocess out
-            let structs      = (catMaybes . generateStruct) out
+            let structs      = (catMaybes . generateStruct) preprocessed
             processStructs (outputDir args) structs
             exitSuccess
   where

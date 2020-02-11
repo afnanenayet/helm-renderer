@@ -35,7 +35,8 @@ yamlFileDelimiter = "---"
 -- This method splits the strings into a list of strings, where each string is
 -- a separate yaml file.
 splitYamls :: T.Text -> [T.Text]
-splitYamls = filter (\x -> T.length x > 0) . T.splitOn yamlFileDelimiter
+splitYamls =
+    filter (\x -> T.length x > 0) . map T.strip . T.splitOn yamlFileDelimiter
 
 -- |Preprocess the shell output from Helm into a YAML file that can be
 -- interpreted by Kubernetes. This will strip debug fields, empty lines, and
@@ -46,7 +47,7 @@ preprocess =
   where
     stripEmptyLines  = filter (\x -> T.length x > 0)
     stripDebugFields = filter (not . isDebugField . head . T.splitOn ":")
-    withoutEndNote   = takeWhile (/= "NOTES:")
+    withoutEndNote   = takeWhile (\x -> T.strip x /= "NOTES:")
 
 -- |Identifies whether a field is a debug field from Helm that isn't part of a
 -- valid k8s spec
