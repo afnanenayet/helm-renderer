@@ -86,12 +86,14 @@ generateStruct txt = map toStruct split
         return (Yaml fp x)
 
 -- |Write the yaml file, given its contents, path, and the parent path
-saveYamlFile :: Maybe String -> Yaml -> IO ()
-saveYamlFile parentDir f = do
-    let fullPath = fullSavePath parentDir (yamlFilePath f)
-    TIO.putStrLn $ saveFileMessage fullPath
-    mktree $ (decodeString . takeDirectory . encodeString) fullPath
-    TIO.writeFile (encodeString fullPath) (fileContents f)
+saveYamlFile :: String -> Maybe String -> Yaml -> IO ()
+saveYamlFile indexPrefix parentDir f = do
+    let rawPath = fullSavePath parentDir (yamlFilePath f)
+    -- We rename the actual filename to add the index prefix, so "x.yaml" becomes "0001_x.yaml"
+    let path    = addPrefixToPath indexPrefix rawPath
+    TIO.putStrLn $ saveFileMessage path
+    mktree $ (decodeString . takeDirectory . encodeString) path
+    TIO.writeFile (encodeString path) (fileContents f)
 
 -- |Create a message to display to the user informing them that a file has been
 -- saved. This will print an error message if the filepath can't be easily
@@ -108,6 +110,37 @@ fullSavePath :: Maybe String -> String -> Turtle.FilePath
 fullSavePath Nothing       fp = decodeString fp
 fullSavePath (Just parent) fp = decodeString parent <> decodeString fp
 
+-- |Pad a string representation of numbers with leading zeros `padZeros 4 20 ==
+-- "0020"`. This is necessary so that the Helm chart files are evaluated in
+-- order, since the Deployinator tool loads them in lexigraphical order.
+indexFilePrefix :: Int -> Int -> String
+indexFilePrefix n width = leadingZeros ++ strN ++ "_"
+  where
+    strN         = show n
+    nWidth       = length strN
+    leadingZeros = replicate (max (width - nWidth) 0) '0'
+
+-- |Add a prefix to a filename, given the whole path. This will only modify the
+-- base filename.
+addPrefixToPath :: String -> Turtle.FilePath -> Turtle.FilePath
+addPrefixToPath prefix path = dir <> decodeString newFileName
+  where
+    dir         = directory path
+    newFileName = mconcat [prefix, encodeString (filename path)]
+
+-- |Process each YAML struct and save them to a file with the index in the
+-- filename so all of the files are processed in the correct order (if they're
+-- processed in alphabetical order).
+processStructs out structs = do
+    let charWidth = (length . show . length) structs
+    let idxZipped = zip [0 ..] structs
+    mapM_
+        (\(index, yaml) -> do
+            let prefix = indexFilePrefix index charWidth
+            saveYamlFile prefix out yaml
+        )
+        idxZipped
+
 main :: IO ()
 main = do
     args <- execParser opts
@@ -121,7 +154,7 @@ main = do
             putStrLn "Retrieved Helm output successfully"
             let preprocessed = preprocess out
             let structs      = (catMaybes . generateStruct) out
-            mapM_ (saveYamlFile (outputDir args)) structs
+            processStructs (outputDir args) structs
             exitSuccess
   where
     opts =
