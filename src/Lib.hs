@@ -17,6 +17,11 @@ import qualified Data.Maybe.Strict             as S
 yamlFileDelimiter :: T.Text
 yamlFileDelimiter = "---"
 
+-- |The Helm chart requests a release name that it adds to every name, we use
+-- this identifier and delete it in the output files.
+generatedReleasePrefix :: T.Text
+generatedReleasePrefix = "generated-"
+
 -- |Split a string that is comprised of multiple YAML files into separate YAML
 -- files.
 --
@@ -43,11 +48,17 @@ splitYamls =
 -- trailing whitespace.
 preprocess :: T.Text -> T.Text
 preprocess =
-    T.unlines . stripEmptyLines . withoutEndNote . stripDebugFields . T.lines
+    T.unlines
+        . stripEmptyLines
+        . withoutRelease
+        . withoutEndNote
+        . stripDebugFields
+        . T.lines
   where
     stripEmptyLines  = filter (\x -> T.length x > 0)
     stripDebugFields = filter (not . isDebugField . head . T.splitOn ":")
     withoutEndNote   = takeWhile (\x -> T.strip x /= "NOTES:")
+    withoutRelease   = map $ T.replace generatedReleasePrefix mempty
 
 -- |Identifies whether a field is a debug field from Helm that isn't part of a
 -- valid k8s spec

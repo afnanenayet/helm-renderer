@@ -4,10 +4,10 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: d4808c55e147bcc739a751b586a13328441e7fd47cfb3a24a20d85c227643fca
+-- hash: 3fbde52500673a5ad4fa855d6619915fdae4dd69e4643bd36de5026e5ae074b8
 
 name:           helm-renderer
-version:        0.1.0.0
+version:        0.1.1.0
 description:    Please see the README on GitHub at <https://github.com/afnanenayet/helm-renderer#readme>
 homepage:       https://github.com/afnanenayet/helm-renderer#readme
 bug-reports:    https://github.com/afnanenayet/helm-renderer/issues
