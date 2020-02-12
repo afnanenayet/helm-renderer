@@ -58,9 +58,8 @@ optParser =
 -- |Generate the Helm command to call to generate the YAML file
 helmCommand :: Args -> String
 helmCommand args =
-    unwords
-        $  ["helm", "install", "generated", chartName args, "--dry-run"]
-        ++ catMaybes [ns, values]
+    unwords $ ["helm", "template", "generated", chartName args] ++ catMaybes
+        [ns, values]
   where
     ns     = namespaceCommand $ namespace args
     values = valuesCommand $ valueFile args
