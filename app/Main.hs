@@ -66,14 +66,12 @@ helmCommand args = unwords
 -- |Generate the portion of the Helm command that dictates which namespace to
 -- use
 namespaceCommand :: Maybe String -> Maybe String
-namespaceCommand Nothing   = Nothing
-namespaceCommand (Just ns) = pure $ unwords ["--namespace", ns]
+namespaceCommand = fmap $ unwords . reverse . flip (:) ["--namespace"]
 
 -- |Generate the portion of the Helm command that dictates which values YAML
 -- file to use
 valuesCommand :: Maybe String -> Maybe String
-valuesCommand Nothing       = Nothing
-valuesCommand (Just values) = pure $ unwords ["-f", values]
+valuesCommand = fmap $ unwords . reverse . flip (:) ["-f"]
 
 -- |Create YAML struct objects with metadata from the Helm output
 generateStruct :: Text -> [Maybe Yaml]
