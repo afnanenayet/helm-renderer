@@ -9,6 +9,7 @@ where
 
 import qualified Data.Text                     as T
 import           Data.List
+import           Data.List.Split
 import           System.FilePath
 import qualified Data.Maybe.Strict             as S
 
@@ -41,7 +42,12 @@ generatedReleasePrefix = "generated-"
 -- a separate yaml file.
 splitYamls :: T.Text -> [T.Text]
 splitYamls =
-    filter (\x -> T.length x > 0) . map T.strip . T.splitOn yamlFileDelimiter
+    map T.strip
+        . filter (\x -> T.length x > 0)
+        . map T.unlines
+        . filter ((>) 0 . length)
+        . splitOn [yamlFileDelimiter]
+        . T.lines
 
 -- |Preprocess the shell output from Helm into a YAML file that can be
 -- interpreted by Kubernetes. This will strip debug fields, empty lines, and

@@ -4,10 +4,10 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 20ced033aa17de5733da1fc967a6e06ca4eae26813e46be00e93380d4377cdcf
+-- hash: fc3a4a03b88dadc81d0e3c7459f77a0507771ef69db88257119d7dfe5179af0b
 
 name:           helm-renderer
-version:        0.1.3.0
+version:        0.1.3.1
 description:    Please see the README on GitHub at <https://github.com/afnanenayet/helm-renderer#readme>
 homepage:       https://github.com/afnanenayet/helm-renderer#readme
 bug-reports:    https://github.com/afnanenayet/helm-renderer/issues
@@ -36,6 +36,7 @@ library
       base >=4.7 && <5
     , filepath
     , optparse-applicative
+    , split
     , strict-base-types
     , text
     , turtle
@@ -53,6 +54,7 @@ executable helm-renderer-exe
     , filepath
     , helm-renderer
     , optparse-applicative
+    , split
     , strict-base-types
     , text
     , turtle
@@ -71,6 +73,7 @@ test-suite helm-renderer-test
     , filepath
     , helm-renderer
     , optparse-applicative
+    , split
     , strict-base-types
     , text
     , turtle

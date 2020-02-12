@@ -1,5 +1,5 @@
 name:                helm-renderer
-version:             0.1.3.0
+version:             0.1.3.1
 github:              "afnanenayet/helm-renderer"
 license:             BSD3
 author:              "Afnan Enayet"
@@ -26,6 +26,7 @@ dependencies:
 - filepath
 - optparse-applicative
 - strict-base-types
+- split
 
 library:
   source-dirs: src
