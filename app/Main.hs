@@ -57,11 +57,13 @@ optParser =
 
 -- |Generate the Helm command to call to generate the YAML file
 helmCommand :: Args -> String
-helmCommand args = unwords
-    ["helm", "install", "generated", chartName args, "--dry-run", ns, values]
+helmCommand args =
+    unwords
+        $  ["helm", "install", "generated", chartName args, "--dry-run"]
+        ++ catMaybes [ns, values]
   where
-    ns     = fromMaybe "" $ namespaceCommand $ namespace args
-    values = fromMaybe "" $ valuesCommand $ valueFile args
+    ns     = namespaceCommand $ namespace args
+    values = valuesCommand $ valueFile args
 
 -- |Generate the portion of the Helm command that dictates which namespace to
 -- use
