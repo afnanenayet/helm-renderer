@@ -43,9 +43,9 @@ generatedReleasePrefix = "generated-"
 splitYamls :: T.Text -> [T.Text]
 splitYamls =
     map T.strip
-        . filter (\x -> T.length x > 0)
+        . filter ((<) 0 . T.length)
         . map T.unlines
-        . filter ((>) 0 . length)
+        . filter ((<) 0 . length) -- remove empty chunks
         . splitOn [yamlFileDelimiter]
         . T.lines
 
