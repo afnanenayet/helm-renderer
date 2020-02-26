@@ -33,6 +33,23 @@ out
 which preserves the file structure from the actual Helm charts, so you can
 mimic the Helm installation while having the charts be split up.
 
+## Usage
+
+```txt
+helm-renderer: render Helm charts
+
+Usage: helm-renderer CHARTNAME [-n|--namespace NAMESPACE] [-f|--values VALUES]
+                     [--out OUTDIR]
+  Render Helm charts
+
+Available options:
+  CHARTNAME                The name of the chart in the form 'repo/chartname'
+  -n,--namespace NAMESPACE The namespace to pass to Helm
+  -f,--values VALUES       The path to the optional values YAML
+  --out OUTDIR             The output directory to write the generated files to
+  -h,--help                Show this help text
+```
+
 ## Installation
 
 ### Stack
