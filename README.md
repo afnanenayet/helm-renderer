@@ -64,21 +64,11 @@ stack install --local-bin-path=/usr/local/bin # or whatever path you want
 
 ### Homebrew
 
-If you want to use Homebrew, you need to make sure you have this in your
-Git config, which will force Homebrew to use SSH to clone the repo, since it
-doesn't work with SAML:
-
-```config
-[url "git@git.blendlabs.com:"]
-    insteadOf = "https://git.blendlabs.com/"
-```
-
 To use the Homebrew tap:
 
 ```sh
 brew tap afnan/helm-renderer
-# Can't use versioned releases with our private git instance :/
-brew install --HEAD helm-renderer
+brew install helm-renderer
 ```
 
 ## Development
