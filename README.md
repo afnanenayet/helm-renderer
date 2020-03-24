@@ -76,7 +76,7 @@ doesn't work with SAML:
 To use the Homebrew tap:
 
 ```sh
-brew tap afnan/helm-renderer git@git.blendlabs.com:blend/helm-renderer.git
+brew tap afnan/helm-renderer
 # Can't use versioned releases with our private git instance :/
 brew install --HEAD helm-renderer
 ```
