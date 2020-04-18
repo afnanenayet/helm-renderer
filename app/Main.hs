@@ -145,16 +145,16 @@ main = do
     args <- execParser opts
     let cmd = helmCommand args
     (code, out) <- shellStrict (T.pack cmd) empty
-    if code /= ExitSuccess
+    if code == ExitSuccess
         then do
-            TIO.putStr out
-            exitWith code
-        else do
             putStrLn "Retrieved Helm output successfully"
             let preprocessed = preprocess out
             let structs      = (catMaybes . generateStruct) preprocessed
             processStructs (outputDir args) structs
             exitSuccess
+        else do
+            TIO.putStr out
+            exitWith code
   where
     opts =
         info (optParser <**> helper)

@@ -14,7 +14,7 @@ import           System.FilePath
 import qualified Data.Maybe.Strict             as S
 
 -- |The delimiter marking the difference between sections in combined YAML
--- files 
+-- files
 yamlFileDelimiter :: T.Text
 yamlFileDelimiter = "---"
 
@@ -87,7 +87,7 @@ templateFolderName = "templates"
 -- |Retrieve the name of the template that the chart. This is a fallible
 -- operation, as there is no guarantee that the source comment will be present
 -- in the YAML file. This also retrieves the directory of the given filepath,
--- getting the path from `/templates/`. 
+-- getting the path from `/templates/`.
 --
 -- This returns
 getTemplatePath :: T.Text -> Maybe FilePath
