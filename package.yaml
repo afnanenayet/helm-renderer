@@ -3,7 +3,7 @@ version:             0.1.4.1
 github:              "afnanenayet/helm-renderer"
 license:             BSD3
 author:              "Afnan Enayet"
-maintainer:          "afnan@blend.com"
+maintainer:          "afnan@afnan.io"
 copyright:           "Afnan Enayet"
 
 extra-source-files:
@@ -17,7 +17,7 @@ extra-source-files:
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
 # common to point users to the README.md file.
-description:         Please see the README on GitHub at <https://github.com/afnanenayet/helm-renderer#readme>
+description: Please see the README on GitHub at <https://github.com/afnanenayet/helm-renderer#readme>
 
 dependencies:
 - base >= 4.7 && < 5
@@ -32,9 +32,9 @@ library:
   source-dirs: src
 
 executables:
-  helm-renderer-exe:
-    main:                Main.hs
-    source-dirs:         app
+  helm-renderer:
+    main: Main.hs
+    source-dirs: app
     ghc-options:
     - -threaded
     - -rtsopts
@@ -44,8 +44,8 @@ executables:
 
 tests:
   helm-renderer-test:
-    main:                Spec.hs
-    source-dirs:         test
+    main: Spec.hs
+    source-dirs: test
     ghc-options:
     - -threaded
     - -rtsopts
