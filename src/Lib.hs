@@ -21,6 +21,20 @@ import qualified Data.Maybe.Strict             as S
 import           Turtle
 import           Data.Maybe
 
+-- |The command line arguments to use for the program
+data Args = Args
+    { chartName :: String
+    , namespace :: Maybe String
+    , valueFile :: Maybe String
+    , outputDir :: Maybe String
+    } deriving Show
+
+-- |A struct containing the contents of a YAML file and its metadata
+data Yaml = Yaml
+    { yamlFilePath :: String -- File path of the YAML file
+    , fileContents :: T.Text -- The text contents of the file
+    } deriving (Show, Eq)
+
 -- |The delimiter marking the difference between sections in combined YAML
 -- files
 yamlFileDelimiter :: T.Text
@@ -121,20 +135,6 @@ getTemplatePath' contents = do
     filepath   <- T.unpack <$> T.stripPrefix sourceCommentLeader sourceLine
     return $ makeValid filepath
 
--- |The command line arguments to use for the program
-data Args = Args
-    { chartName :: String
-    , namespace :: Maybe String
-    , valueFile :: Maybe String
-    , outputDir :: Maybe String
-    } deriving Show
-
--- |A struct containing the contents of a YAML file and its metadata
-data Yaml = Yaml
-    { yamlFilePath :: String
-    , fileContents :: T.Text
-    } deriving Show
-
 -- |Generate the Helm command to call to generate the YAML file
 helmCommand :: Args -> String
 helmCommand args =
@@ -147,12 +147,17 @@ helmCommand args =
 -- |Generate the portion of the Helm command that dictates which namespace to
 -- use
 namespaceCommand :: Maybe String -> Maybe String
-namespaceCommand = fmap $ unwords . reverse . flip (:) ["--namespace"]
+namespaceCommand = fmap $ addNamedFlag "--namespace"
 
 -- |Generate the portion of the Helm command that dictates which values YAML
 -- file to use
 valuesCommand :: Maybe String -> Maybe String
-valuesCommand = fmap $ unwords . reverse . flip (:) ["-f"]
+valuesCommand = fmap $ addNamedFlag "-f"
+
+-- |Given the name of a flag and the value of a flag, create a string with both
+-- values in the proper order.
+addNamedFlag :: String -> String -> String
+addNamedFlag flagName flagValue = unwords [flagName, flagValue]
 
 -- |Create YAML struct objects with metadata from the Helm output
 generateStruct :: Text -> [Maybe Yaml]
@@ -190,22 +195,22 @@ fullSavePath Nothing       fp = decodeString fp
 fullSavePath (Just parent) fp = decodeString parent <> decodeString fp
 
 -- |Pad a string representation of numbers with leading zeros `padZeros 4 20 ==
--- "0020"`. This is necessary so that the Helm chart files are evaluated in
--- order, since the Deployinator tool loads them in lexigraphical order.
+-- "0020"`. This is necessary so that the Helm chart files are listed in order.
 indexFilePrefix :: Int -> Int -> String
-indexFilePrefix n width = leadingZeros ++ strN ++ "_"
+indexFilePrefix x width = mconcat [filePrefix, xStr, "_"]
   where
-    strN         = show n
-    nWidth       = length strN
-    leadingZeros = replicate (max (width - nWidth) 0) '0'
+    xStr             = show x
+    nWidth           = length xStr
+    numLeadingZeroes = max 0 width - nWidth
+    filePrefix       = replicate numLeadingZeroes '0'
 
 -- |Add a prefix to a filename, given the whole path. This will only modify the
--- base filename.
+-- base filename. This also handles string encoding for filepaths.
 addPrefixToPath :: String -> Turtle.FilePath -> Turtle.FilePath
-addPrefixToPath prefix path = dir <> decodeString newFileName
+addPrefixToPath prefix path = directoryOfPath <> prefixedFilename
   where
-    dir         = directory path
-    newFileName = mconcat [prefix, encodeString (filename path)]
+    directoryOfPath  = directory path
+    prefixedFilename = mconcat [decodeString prefix, filename path]
 
 -- |Process each YAML struct and save them to a file with the index in the
 -- filename so all of the files are processed in the correct order (if they're
