@@ -67,7 +67,7 @@ stack install --local-bin-path=/usr/local/bin # or whatever path you want
 To use the Homebrew tap:
 
 ```sh
-brew tap afnan/helm-renderer
+brew tap afnanenayet/helm-renderer
 brew install helm-renderer
 ```
 
