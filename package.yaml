@@ -1,5 +1,5 @@
 name:                helm-renderer
-version:             0.1.4.1
+version:             0.1.4.2
 github:              "afnanenayet/helm-renderer"
 license:             BSD3
 author:              "Afnan Enayet"
