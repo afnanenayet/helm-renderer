@@ -61,4 +61,4 @@ main = do
         info (optParser <**> helper)
             $  fullDesc
             <> progDesc "Render Helm charts"
-            <> Options.Applicative.header "helm-renderer: render Helm charts"
+            <> Options.Applicative.header "helm-renderer"
