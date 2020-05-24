@@ -110,8 +110,6 @@ templateFolderName = "templates"
 -- operation, as there is no guarantee that the source comment will be present
 -- in the YAML file. This also retrieves the directory of the given filepath,
 -- getting the path from `/templates/`.
---
--- This returns
 getTemplatePath :: T.Text -> Maybe FP.FilePath
 getTemplatePath contents = do
     filepath <- getTemplatePath' contents
@@ -215,6 +213,7 @@ addPrefixToPath prefix path = directoryOfPath <> prefixedFilename
 -- |Process each YAML struct and save them to a file with the index in the
 -- filename so all of the files are processed in the correct order (if they're
 -- processed in alphabetical order).
+processStructs :: Maybe String -> [Yaml] -> IO ()
 processStructs out structs = do
     let charWidth = (length . show . length) structs
     let idxZipped = zip [0 ..] structs
