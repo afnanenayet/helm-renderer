@@ -2,5 +2,5 @@
 helm-renderer.cabal
 *~
 .DS_Store
-helm-renderer.sha256
-helm-renderer.tar.gz
+*.sha256
+*.tar.gz
