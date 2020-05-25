@@ -1,3 +1,6 @@
 .stack-work/
 helm-renderer.cabal
 *~
+.DS_Store
+helm-renderer.sha256
+helm-renderer.tar.gz
