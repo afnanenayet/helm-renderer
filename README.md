@@ -57,7 +57,7 @@ Available options:
 If you want (or have) to build from source:
 
 ```sh
-git clone git@git.blendlabs.com:blend/helm-renderer.git
+git clone https://github.com/afnanenayet/helm-renderer.git
 cd helm-renderer
 stack install --local-bin-path=/usr/local/bin # or whatever path you want
 ```
