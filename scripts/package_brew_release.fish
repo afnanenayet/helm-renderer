@@ -2,7 +2,7 @@
 # executable, shell completions, archive them, and then generate the SHA256
 # checksum for the archive.
 
-set release_name "helm-renderer"
+set release_name "helm-renderer-darwin"
 set completion_dir "completions"
 set exe_name "helm-renderer"
 set release_dir "release"
