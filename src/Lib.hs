@@ -40,10 +40,16 @@ data Yaml = Yaml
 yamlFileDelimiter :: T.Text
 yamlFileDelimiter = "---"
 
+-- | An arbitrary string to use for the name of the release. Helm requires some
+-- release name, so we provide one. This also lets us strip the release name
+-- out later.
+helmReleaseName :: String
+helmReleaseName = "generated"
+
 -- |The Helm chart requests a release name that it adds to every name, we use
 -- this identifier and delete it in the output files.
 generatedReleasePrefix :: T.Text
-generatedReleasePrefix = "generated-"
+generatedReleasePrefix = mconcat [T.pack helmReleaseName, "-"]
 
 -- |Split a string that is comprised of multiple YAML files into separate YAML
 -- files.
@@ -136,11 +142,12 @@ getTemplatePath' contents = do
 -- |Generate the Helm command to call to generate the YAML file
 helmCommand :: Args -> String
 helmCommand args =
-    unwords $ ["helm", "template", "generated", chartName args] ++ catMaybes
-        [ns, values]
+    -- We *might* add the namespace and values command if they are provided
+    unwords $ ["helm", "template", helmReleaseName, chartName args] ++ catMaybes
+        [namespaceCmd, valuesCmd]
   where
-    ns     = namespaceCommand $ namespace args
-    values = valuesCommand $ valueFile args
+    namespaceCmd = namespaceCommand $ namespace args
+    valuesCmd    = valuesCommand $ valueFile args
 
 -- |Generate the portion of the Helm command that dictates which namespace to
 -- use
@@ -203,7 +210,7 @@ indexFilePrefix x width = mconcat [filePrefix, xStr, "_"]
     filePrefix       = replicate numLeadingZeroes '0'
 
 -- |Add a prefix to a filename, given the whole path. This will only modify the
--- base filename. This also handles string encoding for filepaths.
+-- base filename. This also handles converting the type to `Turtle.FilePath`.
 addPrefixToPath :: String -> Turtle.FilePath -> Turtle.FilePath
 addPrefixToPath prefix path = directoryOfPath <> prefixedFilename
   where
