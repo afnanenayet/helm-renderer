@@ -29,7 +29,7 @@ jobs:
         cache-name: cache-stack
       with:
         path: ~/.stack
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/*.stack') }}-${{ hashFiles('**/stack.yaml') }}
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/stack.yaml') }}-${{ hashFiles('**/stack.yaml.lock') }}
         restore-keys: |
           ${{ runner.os }}-build-${{ env.cache-name }}-
           ${{ runner.os }}-build-
