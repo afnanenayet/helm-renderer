@@ -20,7 +20,7 @@ jobs:
       with:
         enable-stack: true
         stack-version: "latest"
-        cabal-version: "atest"
+        cabal-version: "latest"
         ghc-version: "8.8.3"
         stack-setup-ghc: true
     - name: Cache
