@@ -14,15 +14,14 @@ jobs:
         os:
           - ubuntu-latest
           - macOS-latest
-          - windows-latest
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-haskell@v1.1
       with:
         enable-stack: true
-        stack-no-global: true
-        stack-version: 'latest'
-        ghc-version: '8.8.3'
+        stack-version: "latest"
+        cabal-version: "atest"
+        ghc-version: "8.8.3"
         stack-setup-ghc: true
     - name: Cache
       uses: actions/cache@v1
