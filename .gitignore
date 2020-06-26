@@ -4,3 +4,4 @@ helm-renderer.cabal
 .DS_Store
 *.sha256
 *.tar.gz
+.hie/
