@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE StrictData #-}
 
 module Lib
     ( preprocess
@@ -71,9 +72,9 @@ generatedReleasePrefix = mconcat [T.pack helmReleaseName, "-"]
 splitYamls :: T.Text -> [T.Text]
 splitYamls =
     map T.strip
-        . filter ((<) 0 . T.length)
+        . filter T.null
         . map T.unlines
-        . filter ((<) 0 . length) -- remove empty chunks
+        . filter null -- remove empty chunks
         . splitOn [yamlFileDelimiter]
         . T.lines
 
@@ -89,10 +90,29 @@ preprocess =
         . stripDebugFields
         . T.lines
   where
-    stripEmptyLines  = filter (\x -> T.length x > 0)
-    stripDebugFields = filter (not . isDebugField . head . T.splitOn ":")
-    withoutEndNote   = takeWhile (\x -> T.strip x /= "NOTES:")
-    withoutRelease   = map $ T.replace generatedReleasePrefix mempty
+    stripEmptyLines = filter (not . T.null)
+    withoutEndNote  = takeWhile (\x -> T.strip x /= "NOTES:")
+    withoutRelease  = map $ T.replace generatedReleasePrefix mempty
+
+-- | Strip debug fields from a yaml file
+--
+-- We define a "debug fields" as a key-value pair in a YAML file whose key
+-- returns true when applied to `isDebugField`.
+stripDebugFields :: [T.Text] -> [T.Text]
+-- Need a safe version for an empty list, since we're using `head` in the other
+-- branch
+stripDebugFields [] = []
+stripDebugFields xs = filter
+    (not . isDebugField . extractHead . safeHead . T.splitOn ":")
+    xs
+  where
+    extractHead :: Maybe T.Text -> T.Text
+    extractHead = Data.Maybe.fromMaybe ""
+
+-- | A safe replacement for `head`
+safeHead :: [a] -> Maybe a
+safeHead []      = Nothing
+safeHead (x : _) = Just x
 
 -- |Identifies whether a field is a debug field from Helm that isn't part of a
 -- valid k8s spec
