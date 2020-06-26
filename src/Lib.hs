@@ -52,6 +52,24 @@ helmReleaseName = "generated"
 generatedReleasePrefix :: T.Text
 generatedReleasePrefix = mconcat [T.pack helmReleaseName, "-"]
 
+-- |Identifies whether a field is a debug field from Helm that isn't part of a
+-- valid k8s spec
+isDebugField :: T.Text -> Bool
+isDebugField "NAME"          = True
+isDebugField "LAST DEPLOYED" = True
+isDebugField "NAMESPACE"     = True
+isDebugField "STATUS"        = True
+isDebugField "REVISION"      = True
+isDebugField "TEST SUITE"    = True
+isDebugField "HOOKS"         = True
+isDebugField "MANIFEST"      = True
+isDebugField _               = False
+
+-- | The prefix in a rendered helm YAML file that indicates which template file
+-- a section was rendered from
+sourceCommentLeader :: T.Text
+sourceCommentLeader = "# Source:"
+
 -- |Split a string that is comprised of multiple YAML files into separate YAML
 -- files.
 --
@@ -113,20 +131,6 @@ stripDebugFields xs = filter
 safeHead :: [a] -> Maybe a
 safeHead []      = Nothing
 safeHead (x : _) = Just x
-
--- |Identifies whether a field is a debug field from Helm that isn't part of a
--- valid k8s spec
-isDebugField :: T.Text -> Bool
-isDebugField "NAME"          = True
-isDebugField "LAST DEPLOYED" = True
-isDebugField "NAMESPACE"     = True
-isDebugField "STATUS"        = True
-isDebugField "REVISION"      = True
-isDebugField "TEST SUITE"    = True
-isDebugField "HOOKS"         = True
-isDebugField "MANIFEST"      = True
-isDebugField _               = False
-
 -- |A constant for the name of the `templates/` folder in Helm. This demarcates
 -- the top-level directory for a set of rendered templates.
 templateFolderName :: String
@@ -144,9 +148,6 @@ getTemplatePath contents = do
     let dir =
             (joinPath . tail . dropWhile (templateFolderName /=)) tokenizedDir
     return dir
-
-sourceCommentLeader :: T.Text
-sourceCommentLeader = "# Source:"
 
 -- |Helper function to get the relative path of a template. This method
 -- isolates the raw text demarcating the path.
