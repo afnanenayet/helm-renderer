@@ -48,7 +48,7 @@ optParser =
 processHelmOutput :: Text -> Args -> IO ()
 processHelmOutput output args = do
   let structs = (catMaybes . generateStruct . preprocess) output
-  processStructs (outputDir args) structs
+  structsToFiles (outputDir args) structs
 
 main :: IO ()
 main = do
