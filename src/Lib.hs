@@ -7,7 +7,7 @@ module Lib
     getTemplatePath,
     helmCommand,
     generateStruct,
-    processStructs,
+    structsToFiles,
     outputDir,
     Args (Args),
   )
@@ -247,8 +247,8 @@ addPrefixToPath prefix path = directoryOfPath <> prefixedFilename
 -- | Process each YAML struct and save them to a file with the index in the
 --  filename so all of the files are processed in the correct order (if they're
 --  processed in alphabetical order).
-processStructs :: Maybe String -> [Yaml] -> IO ()
-processStructs out structs = do
+structsToFiles :: Maybe String -> [Yaml] -> IO ()
+structsToFiles out structs = do
   let charWidth = (length . show . length) structs
   let idxZipped = zip [0 ..] structs
   mapM_

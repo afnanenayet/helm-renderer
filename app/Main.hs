@@ -43,6 +43,13 @@ optParser =
           )
       )
 
+-- | Process the output from a helm command, given the output from the helm
+-- process and the arguments used to generate the output.
+processHelmOutput :: Text -> Args -> IO ()
+processHelmOutput output args = do
+  let structs = (catMaybes . generateStruct . preprocess) output
+  processStructs (outputDir args) structs
+
 main :: IO ()
 main = do
   args <- execParser opts
@@ -51,13 +58,10 @@ main = do
   if code == ExitSuccess
     then do
       putStrLn "Retrieved Helm output successfully"
-      let preprocessed = preprocess out
-      let structs = (catMaybes . generateStruct) preprocessed
-      processStructs (outputDir args) structs
-      exitSuccess
+      processHelmOutput out args
     else do
       TIO.putStr out
-      exitWith code
+  exitWith code
   where
     opts =
       info (optParser <**> helper) $
