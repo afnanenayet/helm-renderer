@@ -15,9 +15,9 @@ stack install --local-bin-path $release_dir
 
 # Generate completions
 mkdir -p $release_dir/$completion_dir
-./$release_dir/$exe_name --bash-completion-script $exe_name > $release_dir/$completion_dir/$exe_name.bash 
-./$release_dir/$exe_name --zsh-completion-script $exe_name > $release_dir/$completion_dir/$exe_name.zsh 
-./$release_dir/$exe_name --fish-completion-script $exe_name > $release_dir/$completion_dir/$exe_name.fish 
+./$release_dir/$exe_name --bash-completion-script $exe_name > $release_dir/$completion_dir/$exe_name.bash
+./$release_dir/$exe_name --zsh-completion-script $exe_name > $release_dir/$completion_dir/$exe_name.zsh
+./$release_dir/$exe_name --fish-completion-script $exe_name > $release_dir/$completion_dir/$exe_name.fish
 
 # Compress the package into an archive
 tar -czf $release_fname -C $release_dir .
