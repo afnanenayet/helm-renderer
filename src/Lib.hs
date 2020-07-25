@@ -33,8 +33,10 @@ data Args = Args
 
 -- | A struct containing the contents of a YAML file and its metadata
 data Yaml = Yaml
-  { yamlFilePath :: String, -- File path of the YAML file
-    fileContents :: T.Text -- The text contents of the file
+  { -- | File path of the YAML file
+    yamlFilePath :: String,
+    -- | The text contents of the file
+    fileContents :: T.Text
   }
   deriving (Show, Eq)
 
@@ -248,12 +250,12 @@ addPrefixToPath prefix path = directoryOfPath <> prefixedFilename
 --  filename so all of the files are processed in the correct order (if they're
 --  processed in alphabetical order).
 structsToFiles :: Maybe String -> [Yaml] -> IO ()
-structsToFiles out structs = do
+structsToFiles outputDirectory structs = do
   let charWidth = (length . show . length) structs
   let idxZipped = zip [0 ..] structs
   mapM_
     ( \(index, yaml) -> do
         let prefix = indexFilePrefix index charWidth
-        saveYamlFile prefix out yaml
+        saveYamlFile prefix outputDirectory yaml
     )
     idxZipped
