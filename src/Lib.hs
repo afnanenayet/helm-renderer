@@ -54,7 +54,7 @@ helmReleaseName = "generated"
 -- | The Helm chart requests a release name that it adds to every name, we use
 --  this identifier and delete it in the output files.
 generatedReleasePrefix :: T.Text
-generatedReleasePrefix = mconcat [T.pack helmReleaseName, "-"]
+generatedReleasePrefix = T.pack helmReleaseName <> "-"
 
 -- | Identifies whether a field is a debug field from Helm that isn't part of a
 --  valid k8s spec
@@ -167,7 +167,11 @@ getTemplatePath' contents = do
   return $ makeValid filepath
 
 -- | Generate the Helm command to call to generate the YAML file
-helmCommand :: Args -> String
+helmCommand ::
+  -- | Arguments to provide to helm
+  Args ->
+  -- | A generated Helm command invocation
+  String
 helmCommand args =
   -- We *might* add the namespace and values command if they are provided
   unwords $
@@ -175,18 +179,18 @@ helmCommand args =
       ++ catMaybes
         [namespaceCmd, valuesCmd]
   where
-    namespaceCmd = namespaceCommand $ namespace args
-    valuesCmd = valuesCommand $ valueFile args
+    namespaceCmd = namespaceCommand <$> namespace args
+    valuesCmd = valuesCommand <$> valueFile args
 
 -- | Generate the portion of the Helm command that dictates which namespace to
 --  use
-namespaceCommand :: Maybe String -> Maybe String
-namespaceCommand = fmap $ addNamedFlag "--namespace"
+namespaceCommand :: String -> String
+namespaceCommand = addNamedFlag "--namespace"
 
 -- | Generate the portion of the Helm command that dictates which values YAML
 --  file to use
-valuesCommand :: Maybe String -> Maybe String
-valuesCommand = fmap $ addNamedFlag "-f"
+valuesCommand :: String -> String
+valuesCommand = addNamedFlag "-f"
 
 -- | Given the name of a flag and the value of a flag, create a string with both
 --  values in the proper order.
@@ -221,21 +225,40 @@ saveFileMessage = f . toText
   where
     f :: Either T.Text T.Text -> T.Text
     f (Left _) = "A file was saved but the filename could not be printed"
-    f (Right text) = mconcat ["Saved ", text]
+    f (Right text) = "Saved " <> text
 
 -- | Calculate the full save path of a YAML file given the config
-fullSavePath :: Maybe String -> String -> Turtle.FilePath
-fullSavePath Nothing fp = decodeString fp
-fullSavePath (Just parent) fp = decodeString parent <> decodeString fp
+fullSavePath ::
+  -- | The optional directory to save the YAML file in
+  Maybe String ->
+  -- | The file path to save the YAML file
+  String ->
+  -- | The full save path for the YAML file
+  Turtle.FilePath
+fullSavePath parent fp = fromJust $ decodedParent <> decodedFP
+  where
+    decodedParent = decodeString <$> parent
+    decodedFP = pure $ decodeString fp
 
--- | Pad a string representation of numbers with leading zeros `padZeros 4 20 ==
---  "0020"`. This is necessary so that the Helm chart files are listed in order.
-indexFilePrefix :: Int -> Int -> String
-indexFilePrefix x width = mconcat [filePrefix, xStr, "_"]
+-- | Pad a string representation of numbers with leading zeros, given the total
+-- width available.
+--
+-- We use this so that the Helm chart files are listed in order when you sort
+-- filenames alphabetically, like when you use `ls. Note that if you supply a
+-- width that is less than the number of digits in `x`, this will simply return
+-- `x` as a string and will *not* truncate the number.
+indexFilePrefix ::
+  -- | The number to pad
+  Int ->
+  -- | The total width to pad to
+  Int ->
+  -- | The number as a string that's padded with leading zeros
+  String
+indexFilePrefix x width = filePrefix <> xStr <> "_"
   where
     xStr = show x
     nWidth = length xStr
-    numLeadingZeroes = max 0 width - nWidth
+    numLeadingZeroes = max 0 (width - nWidth)
     filePrefix = replicate numLeadingZeroes '0'
 
 -- | Add a prefix to a filename, given the whole path. This will only modify the
@@ -244,18 +267,18 @@ addPrefixToPath :: String -> Turtle.FilePath -> Turtle.FilePath
 addPrefixToPath prefix path = directoryOfPath <> prefixedFilename
   where
     directoryOfPath = directory path
-    prefixedFilename = mconcat [decodeString prefix, filename path]
+    prefixedFilename = decodeString prefix <> filename path
 
 -- | Process each YAML struct and save them to a file with the index in the
 --  filename so all of the files are processed in the correct order (if they're
 --  processed in alphabetical order).
 structsToFiles :: Maybe String -> [Yaml] -> IO ()
 structsToFiles outputDirectory structs = do
-  let charWidth = (length . show . length) structs
+  let paddedWidth = (length . show . length) structs
   let idxZipped = zip [0 ..] structs
   mapM_
     ( \(index, yaml) -> do
-        let prefix = indexFilePrefix index charWidth
+        let prefix = indexFilePrefix index paddedWidth
         saveYamlFile prefix outputDirectory yaml
     )
     idxZipped
