@@ -224,7 +224,10 @@ saveFileMessage :: Turtle.FilePath -> T.Text
 saveFileMessage = f . toText
   where
     f :: Either T.Text T.Text -> T.Text
-    f (Left _) = "A file was saved but the filename could not be printed"
+    f (Left e) =
+      "A file was saved but the filename could not be printed."
+        <> "Error: "
+        <> e
     f (Right text) = "Saved " <> text
 
 -- | Calculate the full save path of a YAML file given the config
@@ -263,7 +266,13 @@ indexFilePrefix x width = filePrefix <> xStr <> "_"
 
 -- | Add a prefix to a filename, given the whole path. This will only modify the
 --  base filename. This also handles converting the type to `Turtle.FilePath`.
-addPrefixToPath :: String -> Turtle.FilePath -> Turtle.FilePath
+addPrefixToPath ::
+  -- | The prefix to add to the filename
+  String ->
+  -- | The template path
+  Turtle.FilePath ->
+  -- | The resulting filepath with the prepended prefix
+  Turtle.FilePath
 addPrefixToPath prefix path = directoryOfPath <> prefixedFilename
   where
     directoryOfPath = directory path
