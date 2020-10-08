@@ -21,8 +21,9 @@ jobs:
         enable-stack: true
         stack-version: "latest"
         cabal-version: "latest"
-        ghc-version: "8.8.3"
-        stack-setup-ghc: true
+        ghc-version: "8.8.4"
+        stack-setup-ghc: false
+        stack-no-global: true
     - name: Cache
       uses: actions/cache@v1
       env:
