@@ -3,13 +3,11 @@
 module Main where
 
 import Data.Maybe
-import Data.Semigroup ((<>))
 import qualified Data.Text as T
 import qualified Data.Text.IO as TIO
 import Lib
 import Options.Applicative
 import System.Exit
-import System.FilePath
 import Turtle
 
 optParser :: Parser Args

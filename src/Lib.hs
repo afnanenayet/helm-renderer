@@ -16,7 +16,6 @@ where
 import Data.List
 import Data.List.Split
 import Data.Maybe
-import qualified Data.Maybe.Strict as S
 import qualified Data.Text as T
 import qualified Data.Text.IO as TIO
 import System.FilePath as FP
@@ -149,7 +148,6 @@ templateFolderName = "templates"
 getTemplatePath :: T.Text -> Maybe FP.FilePath
 getTemplatePath contents = do
   filepath <- getTemplatePath' contents
-  let filename = takeFileName filepath
   let tokenizedDir = FP.splitDirectories filepath
   let dir =
         (joinPath . tail . dropWhile (templateFolderName /=)) tokenizedDir
