@@ -236,10 +236,9 @@ fullSavePath ::
   String ->
   -- | The full save path for the YAML file
   Turtle.FilePath
-fullSavePath parent fp = fromJust $ decodedParent <> decodedFP
+fullSavePath parent fp = mconcat $ decodeString <$> paths
   where
-    decodedParent = decodeString <$> parent
-    decodedFP = pure $ decodeString fp
+    paths = catMaybes [parent, pure fp]
 
 -- | Pad a string representation of numbers with leading zeros, given the total
 -- width available.
@@ -255,12 +254,12 @@ indexFilePrefix ::
   Int ->
   -- | The number as a string that's padded with leading zeros
   String
-indexFilePrefix x width = filePrefix <> xStr <> "_"
+indexFilePrefix number width = leftPad <> numberStr <> "_"
   where
-    xStr = show x
-    nWidth = length xStr
+    numberStr = show number
+    nWidth = length numberStr
     numLeadingZeroes = max 0 (width - nWidth)
-    filePrefix = replicate numLeadingZeroes '0'
+    leftPad = replicate numLeadingZeroes '0'
 
 -- | Add a prefix to a filename, given the whole path. This will only modify the
 --  base filename. This also handles converting the type to `Turtle.FilePath`.
