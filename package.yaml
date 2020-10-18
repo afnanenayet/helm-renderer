@@ -27,6 +27,7 @@ dependencies:
 - optparse-applicative
 - strict-base-types
 - split
+- unordered-containers
 
 library:
   source-dirs: src

@@ -13,6 +13,7 @@ module Lib
   )
 where
 
+import qualified Data.HashSet as HashSet
 import Data.List
 import Data.List.Split
 import Data.Maybe
@@ -55,18 +56,27 @@ helmReleaseName = "generated"
 generatedReleasePrefix :: T.Text
 generatedReleasePrefix = T.pack helmReleaseName <> "-"
 
--- | Identifies whether a field is a debug field from Helm that isn't part of a
---  valid k8s spec
+-- | A set of debug fields fields that Helm outputs in its rendered charts with
+-- debug output
+debugFields :: HashSet.HashSet T.Text
+debugFields =
+  HashSet.fromList
+    [ "NAME",
+      "LAST DEPLOYED",
+      "NAMESPACE",
+      "STATUS",
+      "REVISION",
+      "TEST SUITE",
+      "HOOKS",
+      "MANIFEST"
+    ]
+
+-- | Identifies whether a field is a debug field from Helm
+--
+-- We use this method to strip out fields that aren't part of the Kubernetes
+-- spec.
 isDebugField :: T.Text -> Bool
-isDebugField "NAME" = True
-isDebugField "LAST DEPLOYED" = True
-isDebugField "NAMESPACE" = True
-isDebugField "STATUS" = True
-isDebugField "REVISION" = True
-isDebugField "TEST SUITE" = True
-isDebugField "HOOKS" = True
-isDebugField "MANIFEST" = True
-isDebugField _ = False
+isDebugField = flip HashSet.member debugFields
 
 -- | The prefix in a rendered helm YAML file that indicates which template file
 -- a section was rendered from
