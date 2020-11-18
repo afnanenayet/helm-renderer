@@ -13,6 +13,7 @@ module Lib
   )
 where
 
+import Data.Foldable (traverse_)
 import qualified Data.HashSet as HashSet
 import Data.List
 import Data.List.Split
@@ -161,18 +162,23 @@ getTemplatePath contents = do
   let tokenizedDir = FP.splitDirectories filepath
   let dir =
         (joinPath . tail . dropWhile (templateFolderName /=)) tokenizedDir
-  return dir
+  pure dir
 
 -- | Helper function to get the relative path of a template. This method
 --  isolates the raw text demarcating the path.
-getTemplatePath' :: T.Text -> Maybe FP.FilePath
-getTemplatePath' contents = do
-  let ls = T.lines contents
-  sourceLine <- Data.List.find (T.isPrefixOf sourceCommentLeader) ls
-  -- Given some string of the form "path/to/template.yaml", we take the last
-  -- "/" chunk, and strip the ".yaml" from it to get the filename.
-  filepath <- T.unpack <$> T.stripPrefix sourceCommentLeader sourceLine
-  return $ makeValid filepath
+getTemplatePath' ::
+  -- | The text contents of the template file
+  T.Text ->
+  -- | Returns the filepath if the input starts with `sourceCommentLeader`
+  Maybe FP.FilePath
+getTemplatePath' contents = makeValid . T.unpack <$> filepath
+  where
+    ls = T.lines contents
+    -- Find which line the relative path of the template is on
+    sourceLine = Data.List.find (T.isPrefixOf sourceCommentLeader) ls
+    -- Strip the prefix out so we're left with the relative filepath, so
+    -- something like "# Source: /path/" gets transformed to "/path"
+    filepath = sourceLine >>= T.stripPrefix sourceCommentLeader
 
 -- | Generate the Helm command to call to generate the YAML file
 helmCommand ::
@@ -213,7 +219,7 @@ generateStruct txt = map toStruct split
     toStruct :: T.Text -> Maybe Yaml
     toStruct x = do
       fp <- getTemplatePath x
-      return (Yaml fp x)
+      pure (Yaml fp x)
 
 -- | Write the yaml file, given its contents, path, and the parent path
 saveYamlFile :: String -> Maybe String -> Yaml -> IO ()
@@ -292,7 +298,7 @@ structsToFiles :: Maybe String -> [Yaml] -> IO ()
 structsToFiles outputDirectory structs = do
   let paddedWidth = (length . show . length) structs
   let idxZipped = zip [0 ..] structs
-  mapM_
+  traverse_
     ( \(index, yaml) -> do
         let prefix = indexFilePrefix index paddedWidth
         saveYamlFile prefix outputDirectory yaml
