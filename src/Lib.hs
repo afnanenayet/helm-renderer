@@ -9,6 +9,7 @@ module Lib
     generateStruct,
     structsToFiles,
     outputDir,
+    namespaceCommand,
     Args (Args),
   )
 where
@@ -16,6 +17,7 @@ where
 import Data.Foldable (traverse_)
 import qualified Data.HashSet as HashSet
 import Data.List
+import qualified Data.List.NonEmpty as NEL
 import Data.List.Split
 import Data.Maybe
 import qualified Data.Text as T
@@ -128,24 +130,20 @@ preprocess =
 
 -- | Strip debug fields from a yaml file
 --
--- We define a "debug fields" as a key-value pair in a YAML file whose key
+-- We define a "debug field" as a key-value pair in a YAML file whose key
 -- returns true when applied to `isDebugField`.
-stripDebugFields :: [T.Text] -> [T.Text]
+stripDebugFields ::
+  -- | The lines in the YAML file
+  [T.Text] ->
+  -- | Lines with the debug fields filtered out
+  [T.Text]
 -- Need a safe version for an empty list, since we're using `head` in the other
 -- branch
 stripDebugFields [] = []
-stripDebugFields xs =
-  filter
-    (not . isDebugField . extractHead . safeHead . T.splitOn ":")
-    xs
+stripDebugFields xs = filter (pred . T.splitOn ":") xs
   where
-    extractHead :: Maybe T.Text -> T.Text
-    extractHead = Data.Maybe.fromMaybe ""
-
--- | A safe replacement for `head`
-safeHead :: [a] -> Maybe a
-safeHead [] = Nothing
-safeHead (x : _) = Just x
+    pred [] = False
+    pred x = not . isDebugField . NEL.head $ NEL.fromList x
 
 -- | A constant for the name of the `templates/` folder in Helm. This demarcates
 --  the top-level directory for a set of rendered templates.
@@ -166,19 +164,14 @@ getTemplatePath contents = do
 
 -- | Helper function to get the relative path of a template. This method
 --  isolates the raw text demarcating the path.
-getTemplatePath' ::
-  -- | The text contents of the template file
-  T.Text ->
-  -- | Returns the filepath if the input starts with `sourceCommentLeader`
-  Maybe FP.FilePath
-getTemplatePath' contents = makeValid . T.unpack <$> filepath
-  where
-    ls = T.lines contents
-    -- Find which line the relative path of the template is on
-    sourceLine = Data.List.find (T.isPrefixOf sourceCommentLeader) ls
-    -- Strip the prefix out so we're left with the relative filepath, so
-    -- something like "# Source: /path/" gets transformed to "/path"
-    filepath = sourceLine >>= T.stripPrefix sourceCommentLeader
+getTemplatePath' :: T.Text -> Maybe FP.FilePath
+getTemplatePath' contents = do
+  let ls = T.lines contents
+  sourceLine <- Data.List.find (T.isPrefixOf sourceCommentLeader) ls
+  -- Given some string of the form "path/to/template.yaml", we take the last
+  -- "/" chunk, and strip the ".yaml" from it to get the filename.
+  filepath <- T.unpack <$> T.stripPrefix sourceCommentLeader sourceLine
+  pure $ makeValid filepath
 
 -- | Generate the Helm command to call to generate the YAML file
 helmCommand ::
@@ -209,7 +202,7 @@ valuesCommand = addNamedFlag "-f"
 -- | Given the name of a flag and the value of a flag, create a string with both
 --  values in the proper order.
 addNamedFlag :: String -> String -> String
-addNamedFlag flagName flagValue = unwords [flagName, flagValue]
+addNamedFlag flagName flagValue = flagName <> " " <> flagValue
 
 -- | Create YAML struct objects with metadata from the Helm output
 generateStruct :: Text -> [Maybe Yaml]
@@ -252,9 +245,10 @@ fullSavePath ::
   String ->
   -- | The full save path for the YAML file
   Turtle.FilePath
-fullSavePath parent fp = mconcat $ decodeString <$> paths
+fullSavePath parent fp = fromJust $ decodedParent <> decodedFP
   where
-    paths = catMaybes [parent, pure fp]
+    decodedParent = decodeString <$> parent
+    decodedFP = pure $ decodeString fp
 
 -- | Pad a string representation of numbers with leading zeros, given the total
 -- width available.
