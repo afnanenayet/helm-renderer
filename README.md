@@ -1,5 +1,7 @@
 # helm-renderer
 
+![Haskell CI](https://github.com/afnanenayet/helm-renderer/workflows/Haskell%20CI/badge.svg)
+
 Render Helm charts to YAML files that can be used directly with 
 `kubectl apply -f`. This provides some more functionality than using Helm to
 render templates locally. This actually performs a dry-run with Helm so it
