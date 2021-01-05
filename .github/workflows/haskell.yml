@@ -33,14 +33,14 @@ jobs:
       if: matrix.os != 'windows-latest'
       with:
         path: ~/.stack
-        key: ${{ runner.os }}-store-${{ hashFiles('helm-renderer/stack.yaml.lock') }}-${{ hashFiles('helm-renderer/helm-renderer.cabal') }}
+        key: ${{ runner.os }}-store-${{ hashFiles('stack.yaml.lock') }}
 
     - name: Cache dependencies (Windows)
       uses: actions/cache@v2
       if: matrix.os == 'windows-latest'
       with:
         path: 'C:\Users\runneradmin\AppData\Roaming\stack'
-        key: ${{ runner.os }}-store-${{ hashFiles('helm-renderer/stack.yaml.lock') }}-${{ hashFiles('helm-renderer/helm-renderer.cabal') }}
+        key: ${{ runner.os }}-store-${{ hashFiles('stack.yaml.lock') }}
 
     - name: Install dependencies
       run: |
