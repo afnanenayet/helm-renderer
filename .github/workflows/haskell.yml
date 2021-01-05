@@ -42,6 +42,13 @@ jobs:
         path: 'C:\Users\runneradmin\AppData\Roaming\stack'
         key: ${{ runner.os }}-store-${{ hashFiles('stack.yaml.lock') }}
 
+    - name: Cache GHC (Windows)
+      uses: actions/cache@v1
+      if: matrix.os == 'windows-latest'
+      with:
+        path: 'C:\Users\runneradmin\AppData\Local\Programs\stack'
+        key: ghc-${{ hashFiles('stack.yaml.lock') }}
+
     - name: Install dependencies
       run: |
         stack build --system-ghc --test --bench --no-run-tests --no-run-benchmarks --only-dependencies
