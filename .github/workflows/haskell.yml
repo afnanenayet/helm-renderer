@@ -15,7 +15,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        ghc: ["8.10.3"]
+        ghc: ["8.10.4"]
         os: ["ubuntu-latest", "macOS-latest", "windows-latest"]
 
     steps:
