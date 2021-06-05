@@ -9,6 +9,11 @@ set release_dir "release"
 set release_ext ".tar.gz"
 set release_fname "$release_name$release_ext"
 
+if not type -q sha2
+    echo "error: `sha2` binary not found in the user's path"
+    exit 1
+end
+
 # Create the binary
 mkdir -p $release_dir
 stack install --local-bin-path $release_dir
