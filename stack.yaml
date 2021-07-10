@@ -67,4 +67,4 @@ extra-deps:
 # Allow a newer minor version of GHC than the snapshot specifies
 # compiler-check: newer-minor
 ghc-options:
-  "$locals": -fwrite-ide-info -hiedir=.hie
+  "$locals": -fwrite-ide-info -hiedir=.hie -Wall -Werror
