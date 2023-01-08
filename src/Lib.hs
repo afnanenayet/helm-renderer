@@ -15,13 +15,13 @@ module Lib
 where
 
 import Data.Foldable (traverse_)
-import qualified Data.HashSet as HashSet
+import Data.HashSet qualified as HashSet
 import Data.List
-import qualified Data.List.NonEmpty as NEL
+import Data.List.NonEmpty qualified as NEL
 import Data.List.Split
 import Data.Maybe
-import qualified Data.Text as T
-import qualified Data.Text.IO as TIO
+import Data.Text qualified as T
+import Data.Text.IO qualified as TIO
 import System.FilePath as FP
 import Turtle
 
