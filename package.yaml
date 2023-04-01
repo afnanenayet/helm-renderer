@@ -5,6 +5,7 @@ license:             BSD3
 author:              "Afnan Enayet"
 maintainer:          "afnan@afnan.io"
 copyright:           "Afnan Enayet"
+language: GHC2021
 
 extra-source-files:
 - README.md
