@@ -20,6 +20,7 @@ import Data.List
 import Data.List.NonEmpty qualified as NEL
 import Data.List.Split
 import Data.Maybe
+import Data.String.Conversions (cs)
 import Data.Text qualified as T
 import Data.Text.IO qualified as TIO
 import System.FilePath as FP
@@ -220,22 +221,9 @@ saveYamlFile indexPrefix parentDir f = do
   let rawPath = fullSavePath parentDir (yamlFilePath f)
   -- We rename the actual filename to add the index prefix, so "x.yaml" becomes "0001_x.yaml"
   let path = addPrefixToPath indexPrefix rawPath
-  TIO.putStrLn $ saveFileMessage path
-  mktree $ (decodeString . takeDirectory . encodeString) path
-  TIO.writeFile (encodeString path) (fileContents f)
-
--- | Create a message to display to the user informing them that a file has been
---  saved. This will print an error message if the filepath can't be easily
---  converted to a human-readable format.
-saveFileMessage :: Turtle.FilePath -> T.Text
-saveFileMessage = f . toText
-  where
-    f :: Either T.Text T.Text -> T.Text
-    f (Left e) =
-      "A file was saved but the filename could not be printed."
-        <> "Error: "
-        <> e
-    f (Right text) = "Saved " <> text
+  TIO.putStrLn $ "Saved " <> cs path
+  mktree $ takeDirectory path
+  TIO.writeFile path (fileContents f)
 
 -- | Calculate the full save path of a YAML file given the config
 fullSavePath ::
@@ -247,8 +235,8 @@ fullSavePath ::
   Turtle.FilePath
 fullSavePath parent fp = fromJust $ decodedParent <> decodedFP
   where
-    decodedParent = decodeString <$> parent
-    decodedFP = pure $ decodeString fp
+    decodedParent = parent
+    decodedFP = pure fp
 
 -- | Pad a string representation of numbers with leading zeros, given the total
 -- width available.
@@ -283,7 +271,7 @@ addPrefixToPath ::
 addPrefixToPath prefix path = directoryOfPath <> prefixedFilename
   where
     directoryOfPath = directory path
-    prefixedFilename = decodeString prefix <> filename path
+    prefixedFilename = prefix <> filename path
 
 -- | Process each YAML struct and save them to a file with the index in the
 --  filename so all of the files are processed in the correct order (if they're

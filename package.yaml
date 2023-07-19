@@ -29,6 +29,7 @@ dependencies:
 - strict
 - split
 - unordered-containers
+- string-conversions
 
 library:
   source-dirs: src
