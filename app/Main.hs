@@ -3,8 +3,8 @@
 module Main where
 
 import Data.Maybe
-import qualified Data.Text as T
-import qualified Data.Text.IO as TIO
+import Data.Text qualified as T
+import Data.Text.IO qualified as TIO
 import Lib
 import Options.Applicative
 import System.Exit
@@ -28,21 +28,25 @@ optParser =
       )
     <*> optional
       ( strOption
-          ( long "values" <> short 'f' <> metavar "VALUES"
+          ( long "values"
+              <> short 'f'
+              <> metavar "VALUES"
               <> help
                 "The path to the optional values YAML"
           )
       )
     <*> optional
       ( strOption
-          ( long "out" <> metavar "OUTDIR"
+          ( long "out"
+              <> metavar "OUTDIR"
               <> help
                 "The output directory to write the generated files to"
           )
       )
 
--- | Process the output from a helm command, given the output from the helm
--- process and the arguments used to generate the output.
+{- | Process the output from a helm command, given the output from the helm
+process and the arguments used to generate the output.
+-}
 processHelmOutput :: Text -> Args -> IO ()
 processHelmOutput output args = do
   let structs = (catMaybes . generateStruct . preprocess) output
@@ -60,9 +64,9 @@ main = do
     else do
       TIO.putStr out
   exitWith code
-  where
-    opts =
-      info (optParser <**> helper) $
-        fullDesc
-          <> progDesc "Render Helm charts"
-          <> Options.Applicative.header "helm-renderer"
+ where
+  opts =
+    info (optParser <**> helper) $
+      fullDesc
+        <> progDesc "Render Helm charts"
+        <> Options.Applicative.header "helm-renderer"
